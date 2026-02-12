@@ -10,6 +10,7 @@ from . import (
     CONF_DONT_PUBLISH,
     CONF_OBIS_CLASS,
     CONF_CP1251,
+    CONF_MIN_UPDATE_INTERVAL,
 )
 
 AUTO_LOAD = ["dlms_cosem"]
@@ -17,7 +18,6 @@ AUTO_LOAD = ["dlms_cosem"]
 DlmsCosemTextSensor = dlms_cosem_ns.class_(
     "DlmsCosemTextSensor", text_sensor.TextSensor
 )
-
 
 CONFIG_SCHEMA = cv.All(
     text_sensor.text_sensor_schema(
@@ -29,6 +29,7 @@ CONFIG_SCHEMA = cv.All(
             cv.Optional(CONF_DONT_PUBLISH, default=False): cv.boolean,
             cv.Optional(CONF_OBIS_CLASS, default=1): cv.int_,
             cv.Optional(CONF_CP1251): cv.boolean,
+            cv.Optional(CONF_MIN_UPDATE_INTERVAL): cv.positive_time_period_milliseconds,
         }
     ),
     cv.has_exactly_one_key(CONF_OBIS_CODE),
@@ -44,5 +45,8 @@ async def to_code(config):
 
     if conf := config.get(CONF_CP1251):
         cg.add(var.set_cp1251_conversion_required(config[CONF_CP1251]))
-        
+
+    if CONF_MIN_UPDATE_INTERVAL in config:
+        cg.add(var.set_update_interval(config[CONF_MIN_UPDATE_INTERVAL]))
+
     cg.add(component.register_sensor(var))

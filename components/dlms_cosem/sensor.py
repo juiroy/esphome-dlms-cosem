@@ -9,6 +9,7 @@ from . import (
     CONF_OBIS_CODE,
     CONF_DONT_PUBLISH,
     CONF_OBIS_CLASS,
+    CONF_MIN_UPDATE_INTERVAL,
 )
 
 DlmsCosemSensor = dlms_cosem_ns.class_("DlmsCosemSensor", sensor.Sensor)
@@ -25,6 +26,7 @@ CONFIG_SCHEMA = cv.All(
             cv.Optional(CONF_DONT_PUBLISH, default=False): cv.boolean,
             cv.Optional(CONF_MULTIPLIER, default=1.0): cv.float_,
             cv.Optional(CONF_OBIS_CLASS, default=3): cv.int_,
+            cv.Optional(CONF_MIN_UPDATE_INTERVAL): cv.positive_time_period_milliseconds,
         }
     ),
     cv.has_exactly_one_key(CONF_OBIS_CODE),
@@ -38,4 +40,6 @@ async def to_code(config):
     cg.add(var.set_dont_publish(config.get(CONF_DONT_PUBLISH)))
     cg.add(var.set_multiplier(config[CONF_MULTIPLIER]))
     cg.add(var.set_obis_class(config[CONF_OBIS_CLASS]))
+    if CONF_MIN_UPDATE_INTERVAL in config:
+        cg.add(var.set_update_interval(config[CONF_MIN_UPDATE_INTERVAL]))
     cg.add(component.register_sensor(var))

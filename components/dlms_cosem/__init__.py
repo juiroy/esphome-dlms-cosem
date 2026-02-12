@@ -37,6 +37,7 @@ CONF_ADDRESS_LENGTH = "address_length"
 CONF_DELAY_BETWEEN_REQUESTS = "delay_between_requests"
 CONF_DONT_PUBLISH = "dont_publish"
 CONF_CP1251 = "cp1251"
+CONF_MIN_UPDATE_INTERVAL = "min_update_interval"
 
 CONF_PUSH_MODE = "push_mode"
 CONF_PUSH_SHOW_LOG = "push_show_log"

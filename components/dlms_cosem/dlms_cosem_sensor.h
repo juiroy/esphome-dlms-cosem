@@ -34,6 +34,17 @@ class DlmsCosemSensorBase {
   void set_obis_class(int obis_class) { this->obis_class_ = obis_class; }
   int get_obis_class() { return this->obis_class_; }
 
+  void set_update_interval(uint32_t interval_ms) { this->update_interval_ms_ = interval_ms; }
+  uint32_t get_update_interval() const { return this->update_interval_ms_; }
+
+  bool should_update_now() const {
+    if (update_interval_ms_ == 0) return true;  // 0 means every cycle
+    uint32_t now = millis();
+    return (now - last_updated_ms_) >= update_interval_ms_;
+  }
+
+  void mark_updated() { last_updated_ms_ = millis(); }
+
   void reset() {
     has_value_ = false;
     tries_ = 0;
@@ -58,6 +69,8 @@ class DlmsCosemSensorBase {
   uint8_t tries_{0};
   bool we_shall_publish_{true};
   bool scale_and_unit_detected_{false};
+  uint32_t update_interval_ms_{0};   // 0 = every hub cycle
+  uint32_t last_updated_ms_{0};
 };
 
 class DlmsCosemSensor : public DlmsCosemSensorBase, public sensor::Sensor {

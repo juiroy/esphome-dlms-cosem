@@ -598,6 +598,18 @@ void DlmsCosemComponent::handle_data_enq_unit_() {
   auto sens = this->loop_state_.request_iter->second;
   auto type = sens->get_obis_class();
 
+  // Check per-sensor update interval - skip if not due for update
+  if (!sens->should_update_now()) {
+    ESP_LOGD(TAG, "Skipping OBIS %s (%s) - not due for update yet", req.c_str(), sens->get_sensor_name().c_str());
+    this->loop_state_.request_iter = this->sensors_.upper_bound(req);
+    if (this->loop_state_.request_iter != this->sensors_.end()) {
+      this->set_next_state_(State::DATA_ENQ_UNIT);
+    } else {
+      this->set_next_state_(State::SESSION_RELEASE);
+    }
+    return;
+  }
+
   ESP_LOGD(TAG, "OBIS code: %s, Sensor: %s", req.c_str(), sens->get_sensor_name().c_str());
 
   // request units for numeric sensors only and only once
@@ -698,8 +710,9 @@ void DlmsCosemComponent::handle_publish_() {
 
   if (this->loop_state_.sensor_iter != this->sensors_.end()) {
     auto *sensor_base = this->loop_state_.sensor_iter->second;
-    if (sensor_base->shall_we_publish()) {
+    if (sensor_base->shall_we_publish() && sensor_base->has_value()) {
       sensor_base->publish();
+      sensor_base->mark_updated();
     }
     this->loop_state_.sensor_iter++;
   } else {
