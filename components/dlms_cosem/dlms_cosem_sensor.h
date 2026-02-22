@@ -38,7 +38,7 @@ class DlmsCosemSensorBase {
   uint32_t get_update_interval() const { return this->update_interval_ms_; }
 
   bool should_update_now() const {
-    if (update_interval_ms_ == 0) return true;  // 0 means every cycle
+    if (update_interval_ms_ == 0 || last_updated_ms_ == 0) return true;
     uint32_t now = millis();
     return (now - last_updated_ms_) >= update_interval_ms_;
   }
