@@ -45,6 +45,8 @@ class DlmsCosemSensorBase {
 
   void mark_updated() { last_updated_ms_ = millis(); }
 
+  uint32_t get_last_updated() const { return this->last_updated_ms_; }
+
   void reset() {
     has_value_ = false;
     tries_ = 0;

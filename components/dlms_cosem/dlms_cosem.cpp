@@ -601,6 +601,10 @@ void DlmsCosemComponent::handle_data_enq_unit_() {
   // Check per-sensor update interval - skip if not due for update
   if (!sens->should_update_now()) {
     ESP_LOGD(TAG, "Skipping OBIS %s (%s) - not due for update yet", req.c_str(), sens->get_sensor_name().c_str());
+    ESP_LOGD(TAG, "Now %u, last updated %u, interval %u", 
+         millis(), 
+         sens->get_last_updated(), 
+         sens->get_update_interval());
     this->loop_state_.request_iter = this->sensors_.upper_bound(req);
     if (this->loop_state_.request_iter != this->sensors_.end()) {
       this->set_next_state_(State::DATA_ENQ_UNIT);
