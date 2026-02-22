@@ -36,6 +36,7 @@ class DlmsCosemSensorBase {
 
   void set_update_interval(uint32_t interval_ms) { this->update_interval_ms_ = interval_ms; }
   uint32_t get_update_interval() const { return this->update_interval_ms_; }
+  uint32_t get_last_updated() const { return this->last_updated_ms_; }
 
   bool should_update_now() const {
     if (update_interval_ms_ == 0 || last_updated_ms_ == 0) return true;
@@ -43,9 +44,7 @@ class DlmsCosemSensorBase {
     return (now - last_updated_ms_) >= update_interval_ms_;
   }
 
-  void mark_updated() { last_updated_ms_ = millis(); }
 
-  uint32_t get_last_updated() const { return this->last_updated_ms_; }
 
   void reset() {
     has_value_ = false;
@@ -73,6 +72,7 @@ class DlmsCosemSensorBase {
   bool scale_and_unit_detected_{false};
   uint32_t update_interval_ms_{0};   // 0 = every hub cycle
   uint32_t last_updated_ms_{0};
+  void mark_updated() { last_updated_ms_ = millis(); }
 };
 
 class DlmsCosemSensor : public DlmsCosemSensorBase, public sensor::Sensor {
@@ -106,6 +106,7 @@ class DlmsCosemSensor : public DlmsCosemSensorBase, public sensor::Sensor {
     this->value_ = value * scale_f_ * multiplier_;
     this->has_value_ = true;
     this->tries_ = 0;
+    this->mark_updated();
   }
 
  protected:
@@ -149,6 +150,7 @@ class DlmsCosemTextSensor : public DlmsCosemSensorBase, public text_sensor::Text
     }
     has_value_ = true;
     tries_ = 0;
+    this->mark_updated();
   }
 
   optional<bool> cp1251_conversion_required_{nullopt};

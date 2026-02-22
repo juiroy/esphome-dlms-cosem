@@ -716,7 +716,6 @@ void DlmsCosemComponent::handle_publish_() {
     auto *sensor_base = this->loop_state_.sensor_iter->second;
     if (sensor_base->shall_we_publish() && sensor_base->has_value()) {
       sensor_base->publish();
-      sensor_base->mark_updated();
     }
     this->loop_state_.sensor_iter++;
   } else {
